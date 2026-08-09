@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="เรียนพิเศษ">
+<meta name="theme-color" content="#1E4638">
+<title>สมุดเรียนพิเศษ</title>
+<style>
+:root{
+  --paper:#EDF2E9; --card:#FEFDF8; --ink:#22304A; --ink-soft:#5F6A7C;
+  --cover:#1E4638; --cover2:#153327; --gold:#D9B45B; --gold-soft:#F1E4BC;
+  --paid:#2E7D51; --paid-bg:#E3F1E7;
+  --due:#C24040; --due-bg:#FAEAE8;
+  --off:#8B93A1; --off-bg:#EFF1F3;
+  --line:#DCE2D4; --line-soft:#E7EBDF;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Thai",Roboto,sans-serif;
+  background:var(--paper); color:var(--ink); line-height:1.45;
+  -webkit-font-smoothing:antialiased; overscroll-behavior-y:none;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;touch-action:manipulation}
+input{font:inherit}
+svg{display:block}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- header : green bookcloth cover with gold foil ---------- */
+.hdr{
+  position:sticky;top:0;z-index:30;
+  background:linear-gradient(165deg,var(--cover) 0%,var(--cover2) 100%);
+  color:#F6F2E6;
+  padding:calc(10px + env(safe-area-inset-top)) 16px 12px;
+  box-shadow:0 2px 10px rgba(21,51,39,.28);
+}
+.hdr::after{
+  content:"";display:block;height:5px;margin:12px -16px -12px;
+  border-top:1.5px solid var(--gold);
+  border-bottom:1px solid rgba(217,180,91,.45);
+  background:linear-gradient(180deg,rgba(217,180,91,.16),transparent);
+}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-icon{flex:none;width:38px;height:38px;border:1.5px solid var(--gold);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;background:rgba(217,180,91,.08)}
+.brand h1{font-size:19px;font-weight:800;letter-spacing:.2px;white-space:nowrap}
+.brand .sub{font-size:11.5px;color:var(--gold-soft);letter-spacing:.6px;margin-top:1px}
+.today-chip{
+  flex:none;font-size:13px;font-weight:700;color:var(--cover);
+  background:var(--gold);border-radius:99px;padding:7px 14px;
+  box-shadow:0 1px 0 rgba(0,0,0,.2);
+}
+.today-chip.hide{display:none}
+.wknav{display:flex;align-items:center;gap:6px;margin-top:12px}
+.wk-arrow{
+  flex:none;width:40px;height:36px;border:1px solid rgba(246,242,230,.32);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;color:var(--gold-soft);
+}
+.wk-arrow:active{background:rgba(255,255,255,.1)}
+.wk-label{flex:1;text-align:center;line-height:1.25}
+.wk-range{font-size:15.5px;font-weight:700;letter-spacing:.2px}
+.wk-tag{display:block;font-size:10.5px;color:var(--gold-soft);letter-spacing:1.4px;font-weight:600;margin-top:1px}
+
+/* ---------- preview-mode note ---------- */
+.note{
+  margin:10px 12px 0;padding:9px 12px;border:1px solid #E4C88A;border-radius:10px;
+  background:#FBF3DD;color:#7A5B18;font-size:12.5px;
+}
+.hidden{display:none!important}
+
+/* ---------- day tabs : ledger index tabs ---------- */
+.tabs{display:flex;gap:4px;padding:14px 10px 0;position:relative;z-index:2}
+.tab{
+  flex:1;min-width:0;padding:7px 0 9px;text-align:center;border-radius:11px 11px 0 0;
+  background:#E2E8DB;border:1px solid transparent;border-bottom:none;color:var(--ink-soft);
+  display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;
+}
+.tab-d{font-size:11.5px;font-weight:700;letter-spacing:.4px}
+.tab-n{font-size:13.5px;font-weight:700;width:22px;height:22px;line-height:21px;border-radius:50%}
+.tab.today .tab-n{background:var(--cover);color:#F6F2E6}
+.tab.active{
+  background:var(--card);border-color:var(--line);color:var(--ink);
+  margin-bottom:-1px;padding-bottom:10px;box-shadow:inset 0 3px 0 var(--gold);
+}
+.tab .dot{width:5px;height:5px;border-radius:50%;background:transparent}
+.tab .dot.due{background:var(--due)}
+.tab .dot.clear{background:var(--paid)}
+
+/* ---------- day sheet ---------- */
+.sheet-area{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  margin:0 10px 14px;padding:14px 13px 16px;position:relative;z-index:1;
+  box-shadow:0 1px 3px rgba(34,48,74,.05);
+}
+.day-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  padding-bottom:10px;border-bottom:1.5px solid var(--line)}
+.day-title{font-size:12px;font-weight:700;letter-spacing:1.6px;color:var(--cover);text-transform:uppercase}
+.day-mini{font-size:12px;color:var(--ink-soft);font-weight:600}
+.day-mini b.d{color:var(--due)}
+.day-mini b.p{color:var(--paid)}
+
+/* session */
+.sess{padding-top:13px}
+.sess + .sess{margin-top:15px;border-top:1px solid var(--line-soft)}
+.sess-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.time-chip{
+  font-size:13.5px;font-weight:800;letter-spacing:.3px;color:var(--ink);
+  border:1.5px solid var(--ink);border-radius:8px;padding:3px 9px;background:#F7F5EA;
+}
+.badge{
+  font-size:11px;font-weight:700;color:#8A6A1C;background:var(--gold-soft);
+  border:1px solid #E0C88E;border-radius:99px;padding:2.5px 9px;
+}
+.sess-count{margin-left:auto;font-size:12px;color:var(--ink-soft);font-weight:600}
+.sess-acts{display:flex;gap:14px;flex-wrap:wrap;margin:9px 2px 2px}
+.linky{
+  font-size:12.5px;font-weight:700;color:var(--cover);
+  text-decoration:underline dotted rgba(30,70,56,.5);text-underline-offset:3px;padding:2px 0;
+}
+.linky.warn{color:var(--off)}
+.linky.addl{margin-left:auto;color:#8A6A1C}
+
+/* add-student inline form */
+.addrow{display:flex;gap:7px;margin-top:10px}
+.addrow input{
+  flex:1;min-width:0;font-size:16px;padding:9px 11px;border:1.5px solid var(--line);
+  border-radius:10px;background:#fff;color:var(--ink);
+}
+.addrow input:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+.addrow .btn-sm{font-size:14px;font-weight:700;border-radius:10px;padding:0 13px}
+.addrow .go{background:var(--cover);color:#F6F2E6}
+.addrow .no{border:1.5px solid var(--line);color:var(--ink-soft)}
+
+/* student rows : carbon-copy perforation */
+.stu{
+  display:flex;align-items:center;gap:9px;padding:11px 2px;
+  border-top:1px dashed #D6DCCB;
+}
+.addrow + .stu{border-top:none;margin-top:6px}
+.stu-info{flex:1;min-width:0}
+.stu-name{font-size:16.5px;font-weight:700;display:flex;align-items:center;gap:7px}
+.tag-extra{font-size:10px;font-weight:700;color:var(--ink-soft);border:1px solid var(--line);
+  border-radius:99px;padding:1px 7px;letter-spacing:.4px}
+.stu-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
+.stu-sub .due-txt{color:var(--due);font-weight:700}
+.stu.due{border-left:3px solid var(--due);padding-left:8px;margin-left:-2px;background:linear-gradient(90deg,var(--due-bg),transparent 55%)}
+.stu.off{opacity:.5}
+.stu.off .stu-name{text-decoration:line-through}
+.rm{flex:none;width:24px;height:24px;border-radius:50%;color:var(--ink-soft);font-size:15px;line-height:22px;text-align:center;border:1px solid var(--line)}
+
+/* chips */
+.acts{display:flex;gap:6px;flex:none}
+.chip{
+  height:36px;padding:0 11px;border:1.5px solid var(--line);border-radius:10px;
+  background:#fff;font-size:13px;font-weight:700;color:var(--ink-soft);
+  transition:transform .12s ease;
+}
+.chip:active{transform:scale(.94)}
+.chip.c-att.on{border-color:var(--ink);color:var(--ink);background:#EEF1F6}
+.chip.c-off.on{border-color:var(--off);color:#5E6673;background:var(--off-bg)}
+.chip.c-pay.on{
+  border:2px solid var(--paid);color:var(--paid);background:var(--paid-bg);
+  font-weight:800;letter-spacing:.4px;transform:rotate(-4deg);
+  outline:1.5px solid rgba(46,125,81,.35);outline-offset:2px;border-radius:8px;
+}
+.chip.c-pay.on:active{transform:rotate(-4deg) scale(.94)}
+@keyframes stampIn{
+  0%{transform:scale(1.9) rotate(-15deg);opacity:0}
+  55%{transform:scale(.93) rotate(-2deg);opacity:1}
+  100%{transform:scale(1) rotate(-4deg)}
+}
+.chip.c-pay.on.stamp{animation:stampIn .38s cubic-bezier(.2,.85,.3,1.3)}
+
+/* empty monday : ruled ledger paper */
+.rest{
+  margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:26px 16px 30px;
+  text-align:center;color:var(--ink-soft);
+  background:repeating-linear-gradient(180deg,transparent 0 27px,var(--line-soft) 27px 28px);
+}
+.rest .r-icon{margin:0 auto 10px;width:46px;height:46px;border-radius:50%;
+  border:1.5px solid var(--gold);background:var(--card);
+  display:flex;align-items:center;justify-content:center}
+.rest h3{font-size:16px;font-weight:800;color:var(--ink)}
+.rest p{font-size:12.5px;margin-top:3px}
+
+/* ---------- bottom bar ---------- */
+.bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;
+  background:var(--card);border-top:1px solid var(--line);
+  padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 16px rgba(34,48,74,.07);
+}
+.bar button{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:11px;font-weight:700;color:var(--ink-soft);padding:5px 0;position:relative;border-radius:12px;
+}
+.bar button:active{background:var(--paper)}
+.bar .bdg{
+  position:absolute;top:0;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;
+  background:var(--due);color:#fff;font-size:11px;font-weight:800;line-height:18px;
+  border-radius:99px;text-align:center;
+}
+main{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translate(-50%,14px);
+  background:var(--ink);color:#F6F2E6;font-size:13px;font-weight:600;
+  padding:9px 17px;border-radius:99px;opacity:0;pointer-events:none;z-index:60;
+  transition:.22s ease;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.25);
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- bottom sheets ---------- */
+#sheetWrap{position:fixed;inset:0;z-index:50}
+.backdrop{position:absolute;inset:0;background:rgba(18,32,25,.4);opacity:0;transition:.25s}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;background:var(--card);
+  border-radius:20px 20px 0 0;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:10px 16px calc(20px + env(safe-area-inset-bottom));
+  transform:translateY(102%);transition:transform .3s cubic-bezier(.25,.9,.3,1);
+  box-shadow:0 -10px 34px rgba(0,0,0,.22);
+}
+#sheetWrap.open .backdrop{opacity:1}
+#sheetWrap.open .sheet{transform:none}
+.grab{width:38px;height:4.5px;border-radius:99px;background:var(--line);margin:2px auto 12px}
+.sh-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.sh-title{font-size:17px;font-weight:800}
+.sh-x{width:30px;height:30px;border-radius:50%;background:var(--paper);color:var(--ink-soft);font-size:16px;font-weight:700}
+.sh-sec{margin-top:18px}
+.sh-sec:first-of-type{margin-top:0}
+.sh-lbl{font-size:11.5px;font-weight:800;letter-spacing:1.4px;color:var(--cover);margin-bottom:8px}
+
+/* summary */
+.stat2{display:flex;gap:9px}
+.stat{flex:1;border-radius:13px;padding:12px 13px;border:1.5px solid var(--line)}
+.stat .v{font-size:26px;font-weight:800;line-height:1.1}
+.stat .l{font-size:12px;font-weight:700;margin-top:2px}
+.stat.paid{background:var(--paid-bg);border-color:#BCDCC6;color:var(--paid)}
+.stat.due{background:var(--due-bg);border-color:#EBC4BF;color:var(--due)}
+.stat-sub{display:flex;gap:16px;margin-top:9px;font-size:12.5px;color:var(--ink-soft);font-weight:600}
+.sum-day{padding:10px 2px;border-top:1px dashed #D6DCCB;font-size:13.5px}
+.sh-lbl + .sum-day{border-top:none}
+.sum-day .dn{font-weight:800}
+.sum-day .meta{color:var(--ink-soft);font-size:12.5px;margin-top:2px}
+.sum-day .meta .d{color:var(--due);font-weight:700}
+.sum-day .meta .p{color:var(--paid);font-weight:700}
+
+/* due list */
+.due-wk{font-size:11.5px;font-weight:800;letter-spacing:1.2px;color:var(--cover);
+  margin:16px 0 4px;padding-bottom:5px;border-bottom:1.5px solid var(--line)}
+.due-wk:first-of-type{margin-top:2px}
+.due-item{display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px dashed #D6DCCB}
+.due-wk + .due-item{border-top:none}
+.due-item .nm{font-size:15.5px;font-weight:700}
+.due-item .mt{font-size:11.5px;color:var(--ink-soft);margin-top:1px}
+.due-item .pay{
+  margin-left:auto;flex:none;font-size:13px;font-weight:800;color:#fff;
+  background:var(--paid);border-radius:10px;padding:8px 13px;
+}
+.all-clear{text-align:center;padding:26px 0 10px;color:var(--ink-soft)}
+.all-clear .stamp-big{
+  display:inline-block;font-size:19px;font-weight:800;color:var(--paid);
+  border:2.5px solid var(--paid);border-radius:10px;padding:7px 18px;transform:rotate(-5deg);
+  outline:1.5px solid rgba(46,125,81,.35);outline-offset:3px;margin-bottom:12px;letter-spacing:.5px;
+}
+
+/* tools */
+.tool-p{font-size:12.5px;color:var(--ink-soft);margin-bottom:8px}
+#bak{
+  width:100%;height:88px;font-family:ui-monospace,Menlo,monospace;font-size:11px;
+  border:1.5px solid var(--line);border-radius:11px;padding:9px;background:#fff;color:var(--ink);resize:none;
+}
+#bak:focus{outline:2px solid var(--gold);outline-offset:1px}
+.btnrow{display:flex;gap:8px;margin-top:9px}
+.btn{
+  flex:1;font-size:14px;font-weight:700;border-radius:11px;padding:11px 6px;text-align:center;
+  border:1.5px solid var(--line);color:var(--ink);background:#fff;
+}
+.btn.primary{background:var(--cover);border-color:var(--cover);color:#F6F2E6}
+.btn.danger{border-color:#EBC4BF;color:var(--due);background:#fff}
+.btn.danger.arm{background:var(--due);border-color:var(--due);color:#fff}
+.store-line{margin-top:14px;font-size:11.5px;color:var(--ink-soft);text-align:center}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-top">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#D9B45B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h11a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V4z"/>
+          <path d="M17 8h3v10a2 2 0 0 1-2 2h-1"/>
+          <path d="M8 9h5M8 13h5"/>
+        </svg>
+      </div>
+      <div>
+        <h1>สมุดเรียนพิเศษ</h1>
+        <div class="sub">ครูนาย · บันทึกการมาเรียนและค่าเรียน</div>
+      </div>
+    </div>
+    <button class="today-chip" id="todayBtn">วันนี้</button>
+  </div>
+  <div class="wknav">
+    <button class="wk-arrow" id="prevWk" aria-label="สัปดาห์ก่อนหน้า">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="wk-label">
+      <span class="wk-range num" id="wkRange"></span>
+      <span class="wk-tag" id="wkTag"></span>
+    </div>
+    <button class="wk-arrow" id="nextWk" aria-label="สัปดาห์ถัดไป">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="note hidden" id="storageNote">
+  โหมดพรีวิว — ข้อมูลจะไม่ถูกบันทึกถาวร ให้ดาวน์โหลดไฟล์แล้วเปิดใน Safari เพื่อใช้งานจริง
+</div>
+
+<nav class="tabs" id="tabs"></nav>
+<main id="content"></main>
+
+<footer class="bar">
+  <button id="btnSummary">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>
+    </svg>
+    สรุปสัปดาห์
+  </button>
+  <button id="btnDue">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>
+    </svg>
+    ค้างจ่าย
+    <span class="bdg hidden" id="dueBadge"></span>
+  </button>
+  <button id="btnTools">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 8h10M18 8h2M4 16h2M10 16h10"/><circle cx="16" cy="8" r="2.2"/><circle cx="8" cy="16" r="2.2"/>
+    </svg>
+    เครื่องมือ
+  </button>
+</footer>
+
+<div id="toast"></div>
+<div id="sheetWrap" class="hidden">
+  <div class="backdrop" id="backdrop"></div>
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+'use strict';
+/* ============ ตารางสอน ============ */
+var SCHEDULE=[
+  {sessions:[]},
+  {sessions:[
+    {id:'tue1',time:'16.00–17.00 น.',students:['อั่งเปา']},
+    {id:'tue2',time:'18.00–19.00 น.',students:['ต้นน้ำ']}]},
+  {sessions:[
+    {id:'wed1',time:'16.00–17.30 น.',students:['ภูพา'],note:'อาทิตย์เว้นอาทิตย์'}]},
+  {sessions:[
+    {id:'thu1',time:'16.00–17.00 น.',students:['คุนต้า']}]},
+  {sessions:[
+    {id:'fri1',time:'16.00–17.30 น.',students:['แคท','โฌลี','ภูพา','โจจิ','กวิน','พัฒ','หญ้าผิง','พีช']}]},
+  {sessions:[
+    {id:'sat1',time:'15.00–18.00 น.',students:['ขุน','ภู']},
+    {id:'sat2',time:'18.00–19.00 น.',students:['ต้นน้ำ']}]},
+  {sessions:[
+    {id:'sun1',time:'9.00–12.00 น.',students:['กรรณ','โปรดปราณ','กร']},
+    {id:'sun2',time:'13.00–14.30 น.',students:['ภู']}]}
+];
+var SID_META={};
+SCHEDULE.forEach(function(d,i){d.sessions.forEach(function(s){SID_META[s.id]={idx:i,time:s.time};});});
+
+var MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var DFULL=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+var DSHORT=['อา','จ','อ','พ','พฤ','ศ','ส'];
+
+/* ============ storage ============ */
+var KEY='tutorpay-v1', persistent=true, mem={};
+var store=(function(){
+  try{localStorage.setItem('__t','1');localStorage.removeItem('__t');return localStorage;}
+  catch(e){persistent=false;return{getItem:function(k){return k in mem?mem[k]:null;},setItem:function(k,v){mem[k]=String(v);},removeItem:function(k){delete mem[k];}};}
+})();
+var db;
+try{db=JSON.parse(store.getItem(KEY)||'null');}catch(e){db=null;}
+if(!db||typeof db!=='object'||!db.weeks)db={v:1,weeks:{}};
+function save(){try{store.setItem(KEY,JSON.stringify(db));}catch(e){}}
+
+/* ============ dates ============ */
+function mondayOf(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
+function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function be(d){return d.getFullYear()+543;}
+function fmtDM(d){return d.getDate()+' '+MONTHS[d.getMonth()];}
+function fmtRange(mon){
+  var sun=addDays(mon,6);
+  if(mon.getMonth()===sun.getMonth())return mon.getDate()+' – '+sun.getDate()+' '+MONTHS[mon.getMonth()]+' '+be(mon);
+  return fmtDM(mon)+' – '+fmtDM(sun)+' '+be(sun);
+}
+function fmtStamp(t){
+  var d=new Date(t);
+  return DSHORT[d.getDay()]+'. '+fmtDM(d)+' '+String(be(d)).slice(2)+' · '+
+    String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+/* ============ state ============ */
+var today=new Date();
+var viewMon=mondayOf(today);
+var viewDay=(today.getDay()+6)%7;
+var lastStamp=null;
+
+/* ============ records ============ */
+function wkKey(){return iso(viewMon);}
+function getRec(sid,name){
+  var w=db.weeks[wkKey()];
+  return (w&&w[sid]&&w[sid].s&&w[sid].s[name])||null;
+}
+function rec(sid,name){
+  var w=db.weeks[wkKey()]||(db.weeks[wkKey()]={});
+  var s=w[sid]||(w[sid]={s:{},extra:[]});
+  if(!s.s)s.s={};if(!s.extra)s.extra=[];
+  return s.s[name]||(s.s[name]={a:0,p:0,off:0,t:null});
+}
+function extras(sid){
+  var w=db.weeks[wkKey()];
+  return (w&&w[sid]&&w[sid].extra)||[];
+}
+function roster(sess){return sess.students.concat(extras(sess.id));}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ============ stats ============ */
+function dayStats(dayIdx){
+  var st={paid:0,due:0,off:0,blank:0,total:0};
+  SCHEDULE[dayIdx].sessions.forEach(function(sess){
+    roster(sess).forEach(function(n){
+      st.total++;
+      var r=getRec(sess.id,n);
+      if(!r){st.blank++;return;}
+      if(r.off){st.off++;}
+      else if(r.p){st.paid++;}
+      else if(r.a){st.due++;}
+      else{st.blank++;}
+    });
+  });
+  return st;
+}
+function allDueEntries(){
+  var out=[];
+  Object.keys(db.weeks).sort().reverse().forEach(function(wk){
+    var w=db.weeks[wk],parts=wk.split('-');
+    var mon=new Date(+parts[0],+parts[1]-1,+parts[2]);
+    Object.keys(w).forEach(function(sid){
+      var meta=SID_META[sid];if(!meta)return;
+      var s=w[sid].s||{};
+      Object.keys(s).forEach(function(n){
+        var r=s[n];
+        if(r&&r.a&&!r.p&&!r.off){
+          out.push({wk:wk,mon:mon,date:addDays(mon,meta.idx),time:meta.time,sid:sid,name:n});
+        }
+      });
+    });
+  });
+  return out;
+}
+
+/* ============ render ============ */
+function renderHeader(){
+  document.getElementById('wkRange').textContent=fmtRange(viewMon);
+  var cur=sameDay(viewMon,mondayOf(today));
+  document.getElementById('wkTag').textContent=cur?'สัปดาห์นี้':(viewMon<mondayOf(today)?'ย้อนหลัง':'ล่วงหน้า');
+  document.getElementById('todayBtn').classList.toggle('hide',cur&&viewDay===((today.getDay()+6)%7));
+}
+function renderTabs(){
+  var h='';
+  for(var i=0;i<7;i++){
+    var d=addDays(viewMon,i),st=dayStats(i);
+    var dot=st.due>0?'due':(st.total>0&&st.paid>0&&st.paid+st.off===st.total?'clear':'');
+    h+='<button class="tab'+(i===viewDay?' active':'')+(sameDay(d,today)?' today':'')+'" data-day="'+i+'">'+
+      '<span class="tab-d">'+DSHORT[d.getDay()]+'.</span>'+
+      '<span class="tab-n num">'+d.getDate()+'</span>'+
+      '<span class="dot '+dot+'"></span></button>';
+  }
+  document.getElementById('tabs').innerHTML=h;
+}
+function stuRow(sess,name,isExtra){
+  var r=getRec(sess.id,name);
+  var off=r&&r.off,paid=r&&r.p,att=r&&r.a;
+  var due=att&&!paid&&!off;
+  var sub;
+  if(off)sub='งดเรียน · บันทึก '+fmtStamp(r.t);
+  else if(r&&r.t)sub=(due?'<span class="due-txt">ค้างจ่าย</span> · ':'')+'บันทึก '+fmtStamp(r.t);
+  else sub='ยังไม่บันทึก';
+  var stamp=lastStamp&&lastStamp.sid===sess.id&&lastStamp.name===name?' stamp':'';
+  return '<div class="stu'+(due?' due':'')+(off?' off':'')+'">'+
+    '<div class="stu-info"><div class="stu-name">'+esc(name)+(isExtra?'<span class="tag-extra">ชั่วคราว</span>':'')+'</div>'+
+    '<div class="stu-sub num">'+sub+'</div></div>'+
+    (isExtra?'<button class="rm" data-act="rmextra" data-sid="'+sess.id+'" data-name="'+esc(name)+'" aria-label="ลบ">×</button>':'')+
+    '<div class="acts">'+
+    '<button class="chip c-att'+(att?' on':'')+'" data-act="tg" data-f="a" data-sid="'+sess.id+'" data-name="'+esc(name)+'">'+(att?'✓ มา':'มา')+'</button>'+
+    '<button class="chip c-pay'+(paid?' on':'')+stamp+'" data-act="tg" data-f="p" data-sid="'+sess.id+'" data-name="'+esc(name)+'">'+(paid?'ชำระแล้ว':'จ่าย')+'</button>'+
+    '<button class="chip c-off'+(off?' on':'')+'" data-act="tg" data-f="off" data-sid="'+sess.id+'" data-name="'+esc(name)+'">งด</button>'+
+    '</div></div>';
+}
+function renderDay(){
+  var d=addDays(viewMon,viewDay),st=dayStats(viewDay),day=SCHEDULE[viewDay];
+  var h='<div class="sheet-area">';
+  h+='<div class="day-head"><span class="day-title">วัน'+DFULL[d.getDay()]+'ที่ '+fmtDM(d)+' '+be(d)+'</span>';
+  if(st.total>0){
+    h+='<span class="day-mini num">'+(st.paid>0?'<b class="p">จ่าย '+st.paid+'</b>':'')+
+      (st.paid>0&&st.due>0?' · ':'')+(st.due>0?'<b class="d">ค้าง '+st.due+'</b>':'')+
+      (st.paid===0&&st.due===0?'ทั้งหมด '+st.total+' คน':'')+'</span>';
+  }
+  h+='</div>';
+  if(day.sessions.length===0){
+    h+='<div class="rest"><div class="r-icon">'+
+      '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E4638" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+
+      '<path d="M5 10h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-6z"/><path d="M16 11h2a2.5 2.5 0 0 1 0 5h-2"/><path d="M8 6c0-1 .8-1.2.8-2M12 6c0-1 .8-1.2.8-2"/></svg>'+
+      '</div><h3>วันจันทร์ไม่มีคนเรียน</h3><p>วันพักของครูนาย</p></div>';
+  }else{
+    day.sessions.forEach(function(sess){
+      var list=roster(sess);
+      var allOff=list.length>0&&list.every(function(n){var r=getRec(sess.id,n);return r&&r.off;});
+      h+='<div class="sess"><div class="sess-head">'+
+        '<span class="time-chip num">'+sess.time+'</span>'+
+        (sess.note?'<span class="badge">'+sess.note+'</span>':'')+
+        '<span class="sess-count num">'+list.length+' คน</span></div>';
+      h+='<div class="sess-acts">'+
+        '<button class="linky" data-act="bulk" data-f="a" data-sid="'+sess.id+'">มาครบ</button>'+
+        '<button class="linky" data-act="bulk" data-f="p" data-sid="'+sess.id+'">จ่ายครบ</button>'+
+        '<button class="linky warn" data-act="offsess" data-sid="'+sess.id+'">'+(allOff?'ยกเลิกงด':'งดคาบนี้')+'</button>'+
+        '<button class="linky addl" data-act="addform" data-sid="'+sess.id+'">+ เพิ่มชื่อ</button></div>';
+      h+='<div class="addrow hidden" id="add-'+sess.id+'">'+
+        '<input type="text" id="in-'+sess.id+'" placeholder="ชื่อนักเรียน (เฉพาะสัปดาห์นี้)" maxlength="30">'+
+        '<button class="btn-sm go" data-act="addgo" data-sid="'+sess.id+'">เพิ่ม</button>'+
+        '<button class="btn-sm no" data-act="addno" data-sid="'+sess.id+'">ยกเลิก</button></div>';
+      sess.students.forEach(function(n){h+=stuRow(sess,n,false);});
+      extras(sess.id).forEach(function(n){h+=stuRow(sess,n,true);});
+      h+='</div>';
+    });
+  }
+  h+='</div>';
+  document.getElementById('content').innerHTML=h;
+  lastStamp=null;
+}
+function renderBadge(){
+  var n=allDueEntries().length,b=document.getElementById('dueBadge');
+  b.textContent=n;b.classList.toggle('hidden',n===0);
+}
+function renderAll(){renderHeader();renderTabs();renderDay();renderBadge();}
+
+/* ============ toast ============ */
+var toastTimer=null;
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.classList.remove('show');},1700);
+}
+function nowStr(){var d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+
+/* ============ actions ============ */
+function doToggle(sid,name,f){
+  var r=rec(sid,name);
+  if(f==='off'){r.off=r.off?0:1;}
+  else{
+    r[f]=r[f]?0:1;
+    if(f==='p'&&r.p&&!r.a)r.a=1;
+    if(r.a||r.p)r.off=0;
+    if(f==='p'&&r.p)lastStamp={sid:sid,name:name};
+  }
+  r.t=Date.now();
+  save();renderAll();toast('บันทึกแล้ว · '+nowStr());
+}
+function doBulk(sid,f){
+  var meta=SID_META[sid],sess=SCHEDULE[meta.idx].sessions.filter(function(s){return s.id===sid;})[0];
+  roster(sess).forEach(function(n){
+    var r=rec(sid,n);
+    if(r.off)return;
+    if(f==='a'){r.a=1;}else{r.p=1;r.a=1;}
+    r.t=Date.now();
+  });
+  save();renderAll();toast(f==='p'?'ชำระครบทุกคน · '+nowStr():'บันทึกมาเรียนครบ · '+nowStr());
+}
+function doOffSess(sid){
+  var meta=SID_META[sid],sess=SCHEDULE[meta.idx].sessions.filter(function(s){return s.id===sid;})[0];
+  var list=roster(sess);
+  var allOff=list.length>0&&list.every(function(n){var r=getRec(sid,n);return r&&r.off;});
+  list.forEach(function(n){var r=rec(sid,n);r.off=allOff?0:1;r.t=Date.now();});
+  save();renderAll();toast(allOff?'ยกเลิกงดคาบนี้':'งดคาบนี้แล้ว');
+}
+function doAdd(sid){
+  var inp=document.getElementById('in-'+sid);
+  var name=(inp.value||'').trim();
+  if(!name){inp.focus();return;}
+  var meta=SID_META[sid],sess=SCHEDULE[meta.idx].sessions.filter(function(s){return s.id===sid;})[0];
+  if(roster(sess).indexOf(name)>=0){toast('มีชื่อนี้อยู่แล้ว');return;}
+  var w=db.weeks[wkKey()]||(db.weeks[wkKey()]={});
+  var s=w[sid]||(w[sid]={s:{},extra:[]});
+  if(!s.extra)s.extra=[];
+  s.extra.push(name);
+  save();renderAll();toast('เพิ่ม '+name+' แล้ว (สัปดาห์นี้)');
+}
+function doRmExtra(sid,name){
+  var w=db.weeks[wkKey()];if(!w||!w[sid])return;
+  w[sid].extra=(w[sid].extra||[]).filter(function(n){return n!==name;});
+  if(w[sid].s)delete w[sid].s[name];
+  save();renderAll();toast('ลบ '+name+' ออกแล้ว');
+}
+
+/* ============ sheets ============ */
+var wrap=document.getElementById('sheetWrap'),sheetEl=document.getElementById('sheet');
+function openSheet(html){
+  sheetEl.innerHTML='<div class="grab"></div>'+html;
+  wrap.classList.remove('hidden');
+  requestAnimationFrame(function(){requestAnimationFrame(function(){wrap.classList.add('open');});});
+}
+function closeSheet(){
+  wrap.classList.remove('open');
+  setTimeout(function(){wrap.classList.add('hidden');sheetEl.innerHTML='';},280);
+}
+function sheetHead(title){
+  return '<div class="sh-head"><span class="sh-title">'+title+'</span><button class="sh-x" data-act="close">✕</button></div>';
+}
+
+function openSummary(){
+  var tot={paid:0,due:0,off:0,blank:0,total:0},rows='';
+  for(var i=0;i<7;i++){
+    var st=dayStats(i);
+    tot.paid+=st.paid;tot.due+=st.due;tot.off+=st.off;tot.blank+=st.blank;tot.total+=st.total;
+    if(SCHEDULE[i].sessions.length===0)continue;
+    var d=addDays(viewMon,i);
+    var dueNames=[];
+    SCHEDULE[i].sessions.forEach(function(sess){
+      roster(sess).forEach(function(n){
+        var r=getRec(sess.id,n);
+        if(r&&r.a&&!r.p&&!r.off)dueNames.push(n);
+      });
+    });
+    rows+='<div class="sum-day"><span class="dn">'+DFULL[d.getDay()]+' '+fmtDM(d)+'</span>'+
+      '<div class="meta num">'+
+      (st.paid>0?'<span class="p">จ่าย '+st.paid+'</span>':'')+
+      (st.paid>0&&(st.due>0||st.off>0||st.blank>0)?' · ':'')+
+      (st.due>0?'<span class="d">ค้าง '+st.due+' ('+esc(dueNames.join(', '))+')</span>':'')+
+      (st.due>0&&(st.off>0||st.blank>0)?' · ':'')+
+      (st.off>0?'งด '+st.off:'')+
+      (st.off>0&&st.blank>0?' · ':'')+
+      (st.blank>0?'ยังไม่บันทึก '+st.blank:'')+
+      (st.paid===0&&st.due===0&&st.off===0&&st.blank===0?'—':'')+
+      '</div></div>';
+  }
+  var h=sheetHead('สรุปสัปดาห์ '+fmtRange(viewMon))+
+    '<div class="stat2">'+
+    '<div class="stat paid"><div class="v num">'+tot.paid+'</div><div class="l">ชำระแล้ว</div></div>'+
+    '<div class="stat due"><div class="v num">'+tot.due+'</div><div class="l">ค้างจ่าย</div></div></div>'+
+    '<div class="stat-sub num"><span>งดเรียน '+tot.off+'</span><span>ยังไม่บันทึก '+tot.blank+'</span><span>ทั้งหมด '+tot.total+' คน</span></div>'+
+    '<div class="sh-sec"><div class="sh-lbl">รายวัน</div>'+rows+'</div>';
+  openSheet(h);
+}
+
+function openDue(){
+  var list=allDueEntries(),h=sheetHead('รายการค้างจ่ายทั้งหมด');
+  if(list.length===0){
+    h+='<div class="all-clear"><div><span class="stamp-big">เคลียร์ครบ ✓</span></div>ไม่มีรายการค้างจ่าย</div>';
+  }else{
+    var curWk='';
+    list.forEach(function(e){
+      if(e.wk!==curWk){curWk=e.wk;h+='<div class="due-wk num">สัปดาห์ '+fmtRange(e.mon)+'</div>';}
+      h+='<div class="due-item"><div><div class="nm">'+esc(e.name)+'</div>'+
+        '<div class="mt num">'+DFULL[e.date.getDay()]+' '+fmtDM(e.date)+' · '+e.time+'</div></div>'+
+        '<button class="pay" data-act="payto" data-wk="'+e.wk+'" data-sid="'+e.sid+'" data-name="'+esc(e.name)+'">รับเงิน</button></div>';
+    });
+  }
+  openSheet(h);
+}
+function payTo(wk,sid,name){
+  var w=db.weeks[wk];if(!w||!w[sid]||!w[sid].s||!w[sid].s[name])return;
+  var r=w[sid].s[name];r.p=1;r.a=1;r.t=Date.now();
+  save();renderAll();openDue();toast('รับเงิน '+name+' แล้ว · '+nowStr());
+}
+
+function openTools(){
+  var h=sheetHead('เครื่องมือ')+
+    '<div class="sh-sec"><div class="sh-lbl">สำรองข้อมูล</div>'+
+    '<p class="tool-p">คัดลอกข้อความนี้เก็บไว้ (เช่นใน Notes) หรือวางข้อความสำรองเดิมแล้วกดนำเข้า เพื่อย้ายข้อมูลข้ามเครื่อง</p>'+
+    '<textarea id="bak" spellcheck="false"></textarea>'+
+    '<div class="btnrow"><button class="btn primary" data-act="copybak">คัดลอกข้อมูล</button>'+
+    '<button class="btn" data-act="importbak">นำเข้าข้อมูล</button></div></div>'+
+    '<div class="sh-sec"><div class="sh-lbl">รีเซ็ต</div>'+
+    '<p class="tool-p">ปุ่มลบต้องแตะ 2 ครั้งเพื่อยืนยัน ข้อมูลที่ลบแล้วกู้คืนไม่ได้</p>'+
+    '<div class="btnrow"><button class="btn danger" data-act="rstwk">ล้างสัปดาห์นี้</button>'+
+    '<button class="btn danger" data-act="rstall">ล้างข้อมูลทั้งหมด</button></div></div>'+
+    '<div class="store-line">'+(persistent?'ข้อมูลบันทึกอัตโนมัติในเครื่องนี้ · อย่าลบข้อมูลเว็บไซต์ใน Safari':'โหมดพรีวิว — ข้อมูลไม่ถูกบันทึกถาวร')+'</div>';
+  openSheet(h);
+  document.getElementById('bak').value=JSON.stringify(db);
+}
+function armThen(btn,fn){
+  if(btn.classList.contains('arm')){fn();return;}
+  var orig=btn.textContent;
+  btn.classList.add('arm');btn.textContent='แตะอีกครั้งเพื่อยืนยัน';
+  setTimeout(function(){btn.classList.remove('arm');btn.textContent=orig;},2600);
+}
+function copyBak(){
+  var ta=document.getElementById('bak');
+  ta.value=JSON.stringify(db);
+  ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);
+  var ok=false;
+  try{ok=document.execCommand('copy');}catch(e){}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(ta.value).then(function(){toast('คัดลอกแล้ว');});
+    if(!ok)return;
+  }
+  toast(ok?'คัดลอกแล้ว':'กดค้างเพื่อคัดลอกเอง');
+}
+function importBak(){
+  var ta=document.getElementById('bak');
+  try{
+    var parsed=JSON.parse(ta.value);
+    if(!parsed||typeof parsed!=='object'||typeof parsed.weeks!=='object')throw 0;
+    db=parsed;save();renderAll();closeSheet();toast('นำเข้าข้อมูลเรียบร้อย');
+  }catch(e){toast('ข้อความสำรองไม่ถูกต้อง');}
+}
+
+/* ============ events ============ */
+document.getElementById('tabs').addEventListener('click',function(e){
+  var t=e.target.closest('.tab');if(!t)return;
+  viewDay=+t.dataset.day;renderAll();
+});
+document.getElementById('content').addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var act=b.dataset.act,sid=b.dataset.sid,name=b.dataset.name;
+  if(act==='tg')doToggle(sid,name,b.dataset.f);
+  else if(act==='bulk')doBulk(sid,b.dataset.f);
+  else if(act==='offsess')doOffSess(sid);
+  else if(act==='rmextra')doRmExtra(sid,name);
+  else if(act==='addform'){
+    var row=document.getElementById('add-'+sid);
+    row.classList.toggle('hidden');
+    if(!row.classList.contains('hidden'))document.getElementById('in-'+sid).focus();
+  }
+  else if(act==='addgo')doAdd(sid);
+  else if(act==='addno'){
+    document.getElementById('add-'+sid).classList.add('hidden');
+    document.getElementById('in-'+sid).value='';
+  }
+});
+document.getElementById('content').addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&e.target.id&&e.target.id.indexOf('in-')===0){
+    doAdd(e.target.id.slice(3));
+  }
+});
+sheetEl.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var act=b.dataset.act;
+  if(act==='close')closeSheet();
+  else if(act==='payto')payTo(b.dataset.wk,b.dataset.sid,b.dataset.name);
+  else if(act==='copybak')copyBak();
+  else if(act==='importbak')importBak();
+  else if(act==='rstwk')armThen(b,function(){delete db.weeks[wkKey()];save();renderAll();closeSheet();toast('ล้างข้อมูลสัปดาห์นี้แล้ว');});
+  else if(act==='rstall')armThen(b,function(){db={v:1,weeks:{}};save();renderAll();closeSheet();toast('ล้างข้อมูลทั้งหมดแล้ว');});
+});
+document.getElementById('backdrop').addEventListener('click',closeSheet);
+document.getElementById('prevWk').addEventListener('click',function(){viewMon=addDays(viewMon,-7);renderAll();});
+document.getElementById('nextWk').addEventListener('click',function(){viewMon=addDays(viewMon,7);renderAll();});
+document.getElementById('todayBtn').addEventListener('click',function(){
+  today=new Date();viewMon=mondayOf(today);viewDay=(today.getDay()+6)%7;renderAll();
+});
+document.getElementById('btnSummary').addEventListener('click',openSummary);
+document.getElementById('btnDue').addEventListener('click',openDue);
+document.getElementById('btnTools').addEventListener('click',openTools);
+
+/* ============ touch icon (canvas → base64) ============ */
+try{
+  var c=document.createElement('canvas');c.width=180;c.height=180;
+  var g=c.getContext('2d');
+  var grad=g.createLinearGradient(0,0,180,180);
+  grad.addColorStop(0,'#1E4638');grad.addColorStop(1,'#153327');
+  g.fillStyle=grad;g.fillRect(0,0,180,180);
+  g.strokeStyle='#D9B45B';g.lineWidth=4;g.strokeRect(14,14,152,152);
+  g.lineWidth=1.5;g.strokeRect(22,22,136,136);
+  g.fillStyle='#D9B45B';g.font='800 96px -apple-system,sans-serif';
+  g.textAlign='center';g.textBaseline='middle';
+  g.fillText('฿',90,96);
+  var link=document.createElement('link');
+  link.rel='apple-touch-icon';link.href=c.toDataURL('image/png');
+  document.head.appendChild(link);
+}catch(e){}
+
+/* ============ init ============ */
+if(!persistent)document.getElementById('storageNote').classList.remove('hidden');
+renderAll();
+</script>
+</body>
+</html>
