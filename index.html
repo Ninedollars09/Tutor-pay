@@ -147,6 +147,7 @@ svg{display:block}
   border-radius:99px;padding:1px 7px;letter-spacing:.4px}
 .stu-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
 .stu-sub .due-txt{color:var(--due);font-weight:700}
+.noti-txt{color:#8A6A1C;font-weight:700}
 .stu.due{border-left:3px solid var(--due);padding-left:8px;margin-left:-2px;background:linear-gradient(90deg,var(--due-bg),transparent 55%)}
 .stu.off{opacity:.5}
 .stu.off .stu-name{text-decoration:line-through}
@@ -196,12 +197,12 @@ svg{display:block}
 }
 .bar button{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  font-size:11px;font-weight:700;color:var(--ink-soft);padding:5px 0;position:relative;border-radius:12px;
+  font-size:10.5px;font-weight:700;color:var(--ink-soft);padding:5px 0;position:relative;border-radius:12px;
 }
 .bar button:active{background:var(--paper)}
 .bar .bdg{
-  position:absolute;top:0;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;
-  background:var(--due);color:#fff;font-size:11px;font-weight:800;line-height:18px;
+  position:absolute;top:0;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 4px;
+  background:var(--due);color:#fff;font-size:10.5px;font-weight:800;line-height:17px;
   border-radius:99px;text-align:center;
 }
 main{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
@@ -258,9 +259,14 @@ main{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
 .due-wk + .due-item{border-top:none}
 .due-item .nm{font-size:15.5px;font-weight:700}
 .due-item .mt{font-size:11.5px;color:var(--ink-soft);margin-top:1px}
+.due-btns{margin-left:auto;flex:none;display:flex;gap:6px;align-items:center}
+.due-item .mini{
+  font-size:12.5px;font-weight:700;color:var(--cover);background:#fff;
+  border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;
+}
 .due-item .pay{
-  margin-left:auto;flex:none;font-size:13px;font-weight:800;color:#fff;
-  background:var(--paid);border-radius:10px;padding:8px 13px;
+  font-size:13px;font-weight:800;color:#fff;
+  background:var(--paid);border-radius:10px;padding:8px 12px;
 }
 .all-clear{text-align:center;padding:26px 0 10px;color:var(--ink-soft)}
 .all-clear .stamp-big{
@@ -268,6 +274,34 @@ main{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
   border:2.5px solid var(--paid);border-radius:10px;padding:7px 18px;transform:rotate(-5deg);
   outline:1.5px solid rgba(46,125,81,.35);outline-offset:3px;margin-bottom:12px;letter-spacing:.5px;
 }
+
+/* bill / ข้อความแจ้งยอด */
+.seg{display:flex;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg-b{flex:1;font-size:13px;font-weight:700;color:var(--ink-soft);padding:8px 2px;border-radius:9px;text-align:center}
+.seg-b.on{background:var(--cover);color:#F6F2E6;box-shadow:0 1px 2px rgba(21,51,39,.25)}
+.bill-tot{
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  margin-top:12px;padding:11px 13px;border:1.5px solid var(--gold);border-radius:12px;
+  background:linear-gradient(180deg,#FBF5E4,#FEFDF8);
+}
+.bill-tot .l{font-size:12.5px;font-weight:700;color:#8A6A1C}
+.bill-tot .v{font-size:22px;font-weight:800;color:var(--cover)}
+.bill-card{margin-top:12px;border:1px solid var(--line);border-radius:13px;padding:12px 12px 13px;background:#fff}
+.bill-card.done{border-color:#E0C88E;background:#FDFAF1}
+.bill-top{display:flex;align-items:baseline;gap:8px}
+.bill-top .nm{font-size:16.5px;font-weight:800}
+.bill-top .noti{font-size:10.5px;font-weight:700;color:#8A6A1C;border:1px solid #E0C88E;border-radius:99px;padding:1px 7px}
+.bill-top .amt{margin-left:auto;font-size:16.5px;font-weight:800;color:var(--cover)}
+.bill-meta{font-size:11.5px;color:var(--ink-soft);margin-top:3px;line-height:1.5}
+textarea.msg{
+  width:100%;margin-top:9px;font:inherit;font-size:14px;line-height:1.5;
+  border:1.5px solid var(--line);border-radius:11px;padding:10px 11px;
+  background:#FAFBF7;color:var(--ink);resize:none;overflow:hidden;
+}
+textarea.msg:focus{outline:2px solid var(--gold);outline-offset:1px;background:#fff}
+.bill-empty{text-align:center;padding:26px 10px 12px;color:var(--ink-soft);font-size:13.5px;line-height:1.6}
+.bill-empty .big{display:block;font-size:15.5px;font-weight:800;color:var(--ink);margin-bottom:5px}
+.rate-note{margin-top:16px;font-size:11.5px;color:var(--ink-soft);text-align:center;line-height:1.6}
 
 /* tools */
 .tool-p{font-size:12.5px;color:var(--ink-soft);margin-bottom:8px}
@@ -336,7 +370,7 @@ main{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
     <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>
     </svg>
-    สรุปสัปดาห์
+    สรุป
   </button>
   <button id="btnDue">
     <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -344,6 +378,12 @@ main{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
     </svg>
     ค้างจ่าย
     <span class="bdg hidden" id="dueBadge"></span>
+  </button>
+  <button id="btnBill">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 3h14v18l-3-1.6-2 1.6-2-1.6-2 1.6-2-1.6L5 21V3z"/><path d="M9 8h6M9 12h4"/>
+    </svg>
+    แจ้งยอด
   </button>
   <button id="btnTools">
     <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -365,23 +405,34 @@ main{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
 var SCHEDULE=[
   {sessions:[]},
   {sessions:[
-    {id:'tue1',time:'16.00–17.00 น.',students:['อั่งเปา']},
-    {id:'tue2',time:'18.00–19.00 น.',students:['ต้นน้ำ']}]},
+    {id:'tue1',time:'16.00–17.00 น.',hours:1,students:['อั่งเปา']},
+    {id:'tue2',time:'18.00–19.00 น.',hours:1,students:['ต้นน้ำ']}]},
   {sessions:[
-    {id:'wed1',time:'16.00–17.30 น.',students:['ภูพา'],note:'อาทิตย์เว้นอาทิตย์'}]},
+    {id:'wed1',time:'16.00–17.30 น.',hours:1.5,students:['ภูพา'],note:'อาทิตย์เว้นอาทิตย์'}]},
   {sessions:[
-    {id:'thu1',time:'16.00–17.00 น.',students:['คุนต้า']}]},
+    {id:'thu1',time:'16.00–17.00 น.',hours:1,students:['คุนต้า']}]},
   {sessions:[
-    {id:'fri1',time:'16.00–17.30 น.',students:['แคท','โฌลี','ภูพา','โจจิ','กวิน','พัฒ','หญ้าผิง','พีช']}]},
+    {id:'fri1',time:'16.00–17.30 น.',hours:1.5,students:['แคท','โฌลี','ภูพา','โจจิ','กวิน','พัฒ','หญ้าผิง','พีช']}]},
   {sessions:[
-    {id:'sat1',time:'15.00–18.00 น.',students:['ขุน','ภู']},
-    {id:'sat2',time:'18.00–19.00 น.',students:['ต้นน้ำ']}]},
+    {id:'sat1',time:'15.00–18.00 น.',hours:3,students:['ขุน','ภู']},
+    {id:'sat2',time:'18.00–19.00 น.',hours:1,students:['ต้นน้ำ']}]},
   {sessions:[
-    {id:'sun1',time:'9.00–12.00 น.',students:['กรรณ','โปรดปราณ','กร']},
-    {id:'sun2',time:'13.00–14.30 น.',students:['ภู']}]}
+    {id:'sun1',time:'9.00–12.00 น.',hours:3,students:['กรรณ','โปรดปราณ','กร']},
+    {id:'sun2',time:'13.00–14.30 น.',hours:1.5,students:['ภู']}]}
 ];
 var SID_META={};
-SCHEDULE.forEach(function(d,i){d.sessions.forEach(function(s){SID_META[s.id]={idx:i,time:s.time};});});
+SCHEDULE.forEach(function(d,i){d.sessions.forEach(function(s){SID_META[s.id]={idx:i,time:s.time,hours:s.hours};});});
+
+/* ============ ค่าเรียนรายชั่วโมง ============ */
+var RATE_DEFAULT=250, RATE_SPECIAL=200;
+var SPECIAL_NAMES=['ต้นน้ำ','ขุน','ภู'];
+function normName(n){return String(n).trim().replace(/\u0E4D\u0E32/g,'\u0E33');}
+function rateOf(name){
+  var n=normName(name);
+  return SPECIAL_NAMES.indexOf(n)>=0?RATE_SPECIAL:RATE_DEFAULT;
+}
+function fmtHours(h){return String(Math.round(h*10)/10);}
+function fmtBaht(n){return Math.round(n).toLocaleString('en-US');}
 
 var MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 var DFULL=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
@@ -405,6 +456,7 @@ function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
 function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
 function be(d){return d.getFullYear()+543;}
 function fmtDM(d){return d.getDate()+' '+MONTHS[d.getMonth()];}
+function fmtDMY(d){return d.getDate()+' '+MONTHS[d.getMonth()]+' '+be(d);}
 function fmtRange(mon){
   var sun=addDays(mon,6);
   if(mon.getMonth()===sun.getMonth())return mon.getDate()+' – '+sun.getDate()+' '+MONTHS[mon.getMonth()]+' '+be(mon);
@@ -469,12 +521,79 @@ function allDueEntries(){
       Object.keys(s).forEach(function(n){
         var r=s[n];
         if(r&&r.a&&!r.p&&!r.off){
-          out.push({wk:wk,mon:mon,date:addDays(mon,meta.idx),time:meta.time,sid:sid,name:n});
+          out.push({wk:wk,mon:mon,date:addDays(mon,meta.idx),time:meta.time,hours:meta.hours,sid:sid,name:n,noti:r.n||0});
         }
       });
     });
   });
   return out;
+}
+
+/* ============ บิล / ข้อความแจ้งยอด ============ */
+function dueInWeek(wkK,dayFilter){
+  var out=[],w=db.weeks[wkK];if(!w)return out;
+  var parts=wkK.split('-'),mon=new Date(+parts[0],+parts[1]-1,+parts[2]);
+  Object.keys(w).forEach(function(sid){
+    var meta=SID_META[sid];if(!meta)return;
+    if(dayFilter!=null&&meta.idx!==dayFilter)return;
+    var st=w[sid].s||{};
+    Object.keys(st).forEach(function(n){
+      var r=st[n];
+      if(r&&r.a&&!r.p&&!r.off){
+        out.push({wk:wkK,mon:mon,date:addDays(mon,meta.idx),time:meta.time,hours:meta.hours,sid:sid,name:n,noti:r.n||0});
+      }
+    });
+  });
+  return out;
+}
+function billEntries(scope){
+  if(scope==='day')return dueInWeek(wkKey(),viewDay);
+  if(scope==='week')return dueInWeek(wkKey(),null);
+  return allDueEntries();
+}
+function groupBill(entries){
+  var map={},order=[];
+  entries.forEach(function(e){
+    var k=normName(e.name);
+    if(!map[k]){map[k]={name:e.name,items:[],hours:0,noti:0};order.push(k);}
+    var g=map[k];g.items.push(e);g.hours+=(e.hours||0);
+    if(e.noti&&e.noti>g.noti)g.noti=e.noti;
+  });
+  return order.map(function(k){
+    var g=map[k];
+    g.items.sort(function(a,b){return a.date-b.date;});
+    g.rate=rateOf(g.name);
+    g.amount=g.hours*g.rate;
+    return g;
+  });
+}
+function buildMsg(g){
+  var parts=g.items.map(function(it){
+    return fmtDMY(it.date)+' ('+fmtHours(it.hours)+' ชั่วโมง)';
+  });
+  var dates=parts.length===1?parts[0]
+    :parts.slice(0,-1).join(', ')+' และ '+parts[parts.length-1];
+  var total=parts.length>1?' รวม '+fmtHours(g.hours)+' ชั่วโมง':'';
+  return 'สวัสดีครับ ขออนุญาติแจ้งยอดวันที่ '+dates+total+
+    ' รวมเป็นยอด '+fmtBaht(g.amount)+' บาท ขอบคุณครับ';
+}
+function markNoti(g){
+  var t=Date.now();
+  g.items.forEach(function(it){
+    var w=db.weeks[it.wk];
+    if(w&&w[it.sid]&&w[it.sid].s&&w[it.sid].s[it.name])w[it.sid].s[it.name].n=t;
+  });
+  save();
+}
+function markGroupPaid(g){
+  var t=Date.now();
+  g.items.forEach(function(it){
+    var w=db.weeks[it.wk];
+    if(w&&w[it.sid]&&w[it.sid].s&&w[it.sid].s[it.name]){
+      var r=w[it.sid].s[it.name];r.p=1;r.a=1;r.t=t;
+    }
+  });
+  save();
 }
 
 /* ============ render ============ */
@@ -502,7 +621,8 @@ function stuRow(sess,name,isExtra){
   var due=att&&!paid&&!off;
   var sub;
   if(off)sub='งดเรียน · บันทึก '+fmtStamp(r.t);
-  else if(r&&r.t)sub=(due?'<span class="due-txt">ค้างจ่าย</span> · ':'')+'บันทึก '+fmtStamp(r.t);
+  else if(r&&r.t)sub=(due?'<span class="due-txt">ค้างจ่าย</span> · ':'')+
+    (due&&r.n?'<span class="noti-txt">แจ้งแล้ว</span> · ':'')+'บันทึก '+fmtStamp(r.t);
   else sub='ยังไม่บันทึก';
   var stamp=lastStamp&&lastStamp.sid===sess.id&&lastStamp.name===name?' stamp':'';
   return '<div class="stu'+(due?' due':'')+(off?' off':'')+'">'+
@@ -680,8 +800,10 @@ function openDue(){
     list.forEach(function(e){
       if(e.wk!==curWk){curWk=e.wk;h+='<div class="due-wk num">สัปดาห์ '+fmtRange(e.mon)+'</div>';}
       h+='<div class="due-item"><div><div class="nm">'+esc(e.name)+'</div>'+
-        '<div class="mt num">'+DFULL[e.date.getDay()]+' '+fmtDM(e.date)+' · '+e.time+'</div></div>'+
-        '<button class="pay" data-act="payto" data-wk="'+e.wk+'" data-sid="'+e.sid+'" data-name="'+esc(e.name)+'">รับเงิน</button></div>';
+        '<div class="mt num">'+DFULL[e.date.getDay()]+' '+fmtDM(e.date)+' · '+fmtHours(e.hours)+' ชม. · '+fmtBaht(e.hours*rateOf(e.name))+' บาท'+
+        (e.noti?' · <span class="noti-txt">แจ้งแล้ว</span>':'')+'</div></div>'+
+        '<div class="due-btns"><button class="mini" data-act="billone" data-name="'+esc(e.name)+'">แจ้งยอด</button>'+
+        '<button class="pay" data-act="payto" data-wk="'+e.wk+'" data-sid="'+e.sid+'" data-name="'+esc(e.name)+'">รับเงิน</button></div></div>';
     });
   }
   openSheet(h);
@@ -690,6 +812,84 @@ function payTo(wk,sid,name){
   var w=db.weeks[wk];if(!w||!w[sid]||!w[sid].s||!w[sid].s[name])return;
   var r=w[sid].s[name];r.p=1;r.a=1;r.t=Date.now();
   save();renderAll();openDue();toast('รับเงิน '+name+' แล้ว · '+nowStr());
+}
+
+var billScope='day';
+function scopeLabel(sc){
+  if(sc==='day'){var d=addDays(viewMon,viewDay);return 'วัน'+DFULL[d.getDay()]+'ที่ '+fmtDMY(d);}
+  if(sc==='week')return 'สัปดาห์ '+fmtRange(viewMon);
+  return 'ค้างจ่ายทั้งหมดทุกสัปดาห์';
+}
+function openBill(){
+  var groups=groupBill(billEntries(billScope));
+  var grand=groups.reduce(function(a,g){return a+g.amount;},0);
+  var h=sheetHead('ข้อความแจ้งยอด')+
+    '<div class="seg">'+
+    ['day','week','all'].map(function(sc,i){
+      return '<button class="seg-b'+(billScope===sc?' on':'')+'" data-act="scope" data-s="'+sc+'">'+
+        ['วันที่เลือก','สัปดาห์นี้','ค้างทั้งหมด'][i]+'</button>';
+    }).join('')+'</div>';
+  if(groups.length===0){
+    h+='<div class="bill-empty"><span class="big">ไม่มียอดค้างใน'+(billScope==='all'?'ระบบ':'ช่วงนี้')+'</span>'+
+      scopeLabel(billScope)+'<br>หากสอนแล้วยังไม่ได้บันทึก ให้กด "มา" หรือ "มาครบ" ในหน้าวันนั้นก่อน</div>';
+  }else{
+    h+='<div class="bill-tot"><span class="l">'+scopeLabel(billScope)+' · '+groups.length+' คน</span>'+
+      '<span class="v num">'+fmtBaht(grand)+' บาท</span></div>';
+    groups.forEach(function(g,i){
+      var meta=g.items.map(function(it){
+        return fmtDM(it.date)+' '+fmtHours(it.hours)+' ชม.';
+      }).join(' · ');
+      h+='<div class="bill-card'+(g.noti?' done':'')+'">'+
+        '<div class="bill-top"><span class="nm">'+esc(g.name)+'</span>'+
+        (g.noti?'<span class="noti">แจ้งแล้ว</span>':'')+
+        '<span class="amt num">'+fmtBaht(g.amount)+' บาท</span></div>'+
+        '<div class="bill-meta num">'+meta+' · รวม '+fmtHours(g.hours)+' ชม. × '+g.rate+' บาท/ชม.'+
+        (g.noti?'<br>แจ้งล่าสุด '+fmtStamp(g.noti):'')+'</div>'+
+        '<textarea class="msg" id="msg-'+i+'" rows="3" spellcheck="false">'+esc(buildMsg(g))+'</textarea>'+
+        '<div class="btnrow"><button class="btn primary" data-act="copymsg" data-i="'+i+'">คัดลอกข้อความ</button>'+
+        '<button class="btn" data-act="billpaid" data-i="'+i+'">รับเงินแล้ว</button></div></div>';
+    });
+    h+='<div class="rate-note">ต้นน้ำ · ขุน · ภู คิด '+RATE_SPECIAL+' บาท/ชม. · คนอื่น '+RATE_DEFAULT+' บาท/ชม.<br>แก้ข้อความในกล่องได้ก่อนคัดลอก</div>';
+  }
+  billGroups=groups;
+  openSheet(h);
+  sizeMsgs();
+}
+var billGroups=[];
+function sizeMsgs(){
+  var list=sheetEl.querySelectorAll('textarea.msg');
+  for(var i=0;i<list.length;i++){
+    list[i].style.height='auto';
+    list[i].style.height=(list[i].scrollHeight+2)+'px';
+  }
+}
+function copyTA(ta){
+  ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);
+  var ok=false;
+  try{ok=document.execCommand('copy');}catch(e){}
+  if(!ok&&navigator.clipboard&&navigator.clipboard.writeText){
+    try{navigator.clipboard.writeText(ta.value);ok=true;}catch(e){}
+  }
+  return ok;
+}
+function copyMsg(i){
+  var g=billGroups[i],ta=document.getElementById('msg-'+i);
+  if(!g||!ta)return;
+  var ok=copyTA(ta);
+  markNoti(g);
+  renderAll();
+  var pos=sheetEl.scrollTop;
+  openBill();
+  sheetEl.scrollTop=pos;
+  toast(ok?'คัดลอกข้อความ '+g.name+' แล้ว':'กดค้างที่ข้อความเพื่อคัดลอก');
+}
+function billPaid(i){
+  var g=billGroups[i];if(!g)return;
+  markGroupPaid(g);renderAll();
+  var pos=sheetEl.scrollTop;
+  openBill();
+  sheetEl.scrollTop=pos;
+  toast('รับเงิน '+g.name+' '+fmtBaht(g.amount)+' บาท · '+nowStr());
 }
 
 function openTools(){
@@ -767,6 +967,15 @@ sheetEl.addEventListener('click',function(e){
   var act=b.dataset.act;
   if(act==='close')closeSheet();
   else if(act==='payto')payTo(b.dataset.wk,b.dataset.sid,b.dataset.name);
+  else if(act==='scope'){billScope=b.dataset.s;openBill();sheetEl.scrollTop=0;}
+  else if(act==='copymsg')copyMsg(+b.dataset.i);
+  else if(act==='billpaid')billPaid(+b.dataset.i);
+  else if(act==='billone'){billScope='all';openBill();
+    setTimeout(function(){
+      var idx=-1;
+      billGroups.forEach(function(g,i){if(normName(g.name)===normName(b.dataset.name))idx=i;});
+      if(idx>=0){var el=document.getElementById('msg-'+idx);if(el&&el.closest('.bill-card'))el.closest('.bill-card').scrollIntoView({block:'center'});}
+    },60);}
   else if(act==='copybak')copyBak();
   else if(act==='importbak')importBak();
   else if(act==='rstwk')armThen(b,function(){delete db.weeks[wkKey()];save();renderAll();closeSheet();toast('ล้างข้อมูลสัปดาห์นี้แล้ว');});
@@ -780,6 +989,7 @@ document.getElementById('todayBtn').addEventListener('click',function(){
 });
 document.getElementById('btnSummary').addEventListener('click',openSummary);
 document.getElementById('btnDue').addEventListener('click',openDue);
+document.getElementById('btnBill').addEventListener('click',function(){billScope='day';openBill();});
 document.getElementById('btnTools').addEventListener('click',openTools);
 
 /* ============ touch icon (canvas → base64) ============ */
