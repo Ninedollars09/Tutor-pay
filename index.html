@@ -288,6 +288,10 @@ main{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
 .bill-tot .v{font-size:22px;font-weight:800;color:var(--cover)}
 .bill-card{margin-top:12px;border:1px solid var(--line);border-radius:13px;padding:12px 12px 13px;background:#fff}
 .bill-card.done{border-color:#E0C88E;background:#FDFAF1}
+.bill-card .btn{font-size:13px;padding:11px 4px}
+.btn.line{background:#06C755;border-color:#06C755;color:#fff;display:block;text-decoration:none}
+.btn.line:active{background:#05A648;border-color:#05A648}
+.bill-prog{margin-top:7px;font-size:12px;font-weight:700;color:#8A6A1C;text-align:center}
 .bill-top{display:flex;align-items:baseline;gap:8px}
 .bill-top .nm{font-size:16.5px;font-weight:800}
 .bill-top .noti{font-size:10.5px;font-weight:700;color:#8A6A1C;border:1px solid #E0C88E;border-radius:99px;padding:1px 7px}
@@ -835,6 +839,8 @@ function openBill(){
   }else{
     h+='<div class="bill-tot"><span class="l">'+scopeLabel(billScope)+' · '+groups.length+' คน</span>'+
       '<span class="v num">'+fmtBaht(grand)+' บาท</span></div>';
+    var notiN=groups.filter(function(g){return g.noti;}).length;
+    if(notiN>0)h+='<div class="bill-prog num">แจ้งแล้ว '+notiN+' จาก '+groups.length+' คน</div>';
     groups.forEach(function(g,i){
       var meta=g.items.map(function(it){
         return fmtDM(it.date)+' '+fmtHours(it.hours)+' ชม.';
@@ -846,16 +852,27 @@ function openBill(){
         '<div class="bill-meta num">'+meta+' · รวม '+fmtHours(g.hours)+' ชม. × '+g.rate+' บาท/ชม.'+
         (g.noti?'<br>แจ้งล่าสุด '+fmtStamp(g.noti):'')+'</div>'+
         '<textarea class="msg" id="msg-'+i+'" rows="3" spellcheck="false">'+esc(buildMsg(g))+'</textarea>'+
-        '<div class="btnrow"><button class="btn primary" data-act="copymsg" data-i="'+i+'">คัดลอกข้อความ</button>'+
-        '<button class="btn" data-act="billpaid" data-i="'+i+'">รับเงินแล้ว</button></div></div>';
+        '<div class="btnrow">'+
+        '<a class="btn line" data-act="lineopen" data-i="'+i+'" href="'+lineHref(buildMsg(g))+'">ส่ง LINE</a>'+
+        '<button class="btn" data-act="copymsg" data-i="'+i+'">คัดลอก</button>'+
+        '<button class="btn" data-act="billpaid" data-i="'+i+'">รับเงิน</button></div></div>';
     });
-    h+='<div class="rate-note">ต้นน้ำ · ขุน · ภู คิด '+RATE_SPECIAL+' บาท/ชม. · คนอื่น '+RATE_DEFAULT+' บาท/ชม.<br>แก้ข้อความในกล่องได้ก่อนคัดลอก</div>';
+    h+='<div class="rate-note">ต้นน้ำ · ขุน · ภู คิด '+RATE_SPECIAL+' บาท/ชม. · คนอื่น '+RATE_DEFAULT+' บาท/ชม.<br>แก้ข้อความในกล่องได้ก่อนส่ง<br>ปุ่ม "ส่ง LINE" จะเปิด LINE พร้อมข้อความ ให้เลือกแชทผู้ปกครองแล้วกดส่งเอง</div>';
   }
   billGroups=groups;
   openSheet(h);
   sizeMsgs();
 }
 var billGroups=[];
+function lineHref(txt){return 'line://msg/text/'+encodeURIComponent(txt);}
+function lineOpen(i){
+  var g=billGroups[i];if(!g)return;
+  markNoti(g);renderAll();
+  setTimeout(function(){
+    if(!wrap.classList.contains('open'))return;
+    var pos=sheetEl.scrollTop;openBill();sheetEl.scrollTop=pos;
+  },700);
+}
 function sizeMsgs(){
   var list=sheetEl.querySelectorAll('textarea.msg');
   for(var i=0;i<list.length;i++){
@@ -968,6 +985,7 @@ sheetEl.addEventListener('click',function(e){
   if(act==='close')closeSheet();
   else if(act==='payto')payTo(b.dataset.wk,b.dataset.sid,b.dataset.name);
   else if(act==='scope'){billScope=b.dataset.s;openBill();sheetEl.scrollTop=0;}
+  else if(act==='lineopen')lineOpen(+b.dataset.i);
   else if(act==='copymsg')copyMsg(+b.dataset.i);
   else if(act==='billpaid')billPaid(+b.dataset.i);
   else if(act==='billone'){billScope='all';openBill();
@@ -980,6 +998,13 @@ sheetEl.addEventListener('click',function(e){
   else if(act==='importbak')importBak();
   else if(act==='rstwk')armThen(b,function(){delete db.weeks[wkKey()];save();renderAll();closeSheet();toast('ล้างข้อมูลสัปดาห์นี้แล้ว');});
   else if(act==='rstall')armThen(b,function(){db={v:1,weeks:{}};save();renderAll();closeSheet();toast('ล้างข้อมูลทั้งหมดแล้ว');});
+});
+sheetEl.addEventListener('input',function(e){
+  var ta=e.target;
+  if(!ta||!ta.classList||!ta.classList.contains('msg'))return;
+  ta.style.height='auto';ta.style.height=(ta.scrollHeight+2)+'px';
+  var card=ta.closest('.bill-card');
+  if(card){var a=card.querySelector('a.line');if(a)a.setAttribute('href',lineHref(ta.value));}
 });
 document.getElementById('backdrop').addEventListener('click',closeSheet);
 document.getElementById('prevWk').addEventListener('click',function(){viewMon=addDays(viewMon,-7);renderAll();});
